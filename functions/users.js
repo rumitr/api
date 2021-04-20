@@ -1,10 +1,9 @@
 const faker = require("faker");
-function getUsers(number = 109) {
+function getUsers(page, size) {
   let users = [];
-  for (let i = 0; i < number; i++) {
+  for (let i = (page - 1) * size; i < page * size; i++) {
     users.push(getUser(i));
   }
-  console.log(users);
   return users;
 }
 function getUser(index) {
@@ -26,10 +25,11 @@ const headers = {
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
 };
 exports.handler = async function (event, context) {
-  const { size = 29 } = event.queryStringParameters;
+  const { page = 1, size = 11 } = event.queryStringParameters;
+  const total = Math.ceil(10000 / size);
   return {
     statusCode: 200,
     headers,
-    body: JSON.stringify(getUsers(size)),
+    body: JSON.stringify({ page, total, size, data: getUsers(page, size) }),
   };
 };
